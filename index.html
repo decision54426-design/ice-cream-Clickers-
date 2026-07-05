@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICE CREAM</title>
+    <title>ICE CREAM V2</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         body { background: linear-gradient(135deg, #ffdee9, #b5fffc); font-family: Arial, sans-serif; text-align: center; color: #4a4a4a; min-height: 100vh; padding: 5px; }
-        .main-layout { display: flex; justify-content: center; gap: 5px; max-width: 100%; margin: 0 auto; }
+        .main-layout { display: flex; justify-content: center; gap: 6px; max-width: 100%; margin: 0 auto; }
         .center-area { width: 220px; display: flex; flex-direction: column; gap: 5px; }
-        .side-panel { width: 160px; background: rgba(255,255,255,0.8); border: 2px solid #ffccd5; border-radius: 10px; padding: 5px; font-size: 11px; }
-        .score-box { font-size: 24px; font-weight: bold; color: #ff6b8b; }
-        .click-area { height: 90px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .icecream { width: 80px; height: 80px; background: radial-gradient(#fff, #ffccd5); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(255,182,193,0.5); display: flex; justify-content: center; align-items: center; font-size: 40px; transition: transform 0.05s; }
+        .side-panel { width: 160px; background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 6px; font-size: 11px; }
+        .score-box { font-size: 26px; font-weight: bold; color: #ff6b8b; }
+        .click-area { height: 95px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .icecream { width: 85px; height: 85px; background: radial-gradient(#fff, #ffccd5); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(255,182,193,0.5); display: flex; justify-content: center; align-items: center; font-size: 45px; transition: transform 0.05s; }
         .icecream:active { transform: scale(0.9); }
         .num-pop { position: absolute; color: #ff6b8b; font-weight: bold; font-size: 16px; animation: fUp 0.5s ease-out forwards; pointer-events: none; text-shadow: 1px 1px #fff; }
-        @keyframes fUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
+        @keyframes fUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
         .panel-block { background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 5px; }
         .item { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #ffe4e1; border-radius: 6px; padding: 4px; margin-top: 3px; font-size: 10px; font-weight: bold; text-align: left; }
         .rb-btn { background: #ff6b8b; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; }
         .coin-btn { background: #ffa500; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; }
-        .title { font-size: 10px; color: #ff6b8b; font-weight: bold; text-align: left; border-bottom: 1px dashed #ffccd5; }
-        .r-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 10px; }
+        .title { font-size: 11px; color: #ff6b8b; font-weight: bold; text-align: left; border-bottom: 1px dashed #ffccd5; padding-bottom: 2px; }
+        .r-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>ICE CREAM CLICKER</h1>
+    <h1 style="font-size:18px; color:#ff6b8b; margin-bottom:5px;">ICE CREAM CLICKER v2</h1>
     <div class="main-layout">
-        <!-- 左パネル -->
+        <!-- 左パネル：ランキング -->
         <div class="side-panel">
             <div class="title">🌐 RANKING</div>
-            <div class="r-row" style="color:#ff6b8b;"><div>🥇 1st (YOU)</div><div><span id="r1">0</span></div></div>
-            <div class="r-row"><div>🥈 2nd (Cookie)</div><div>150,000</div></div>
+            <div class="r-row" style="color:#ff6b8b; background:rgba(255,107,139,0.1); border-radius:4px; padding:2px;"><div>🥇 1st (YOU)</div><div><span id="r1">0</span></div></div>
+            <div class="r-row" style="border-bottom:1px solid #fff3f5;"><div>🥈 2nd (Cookie)</div><div>150,000</div></div>
             <div class="r-row"><div>🥉 3rd (Sweets)</div><div>50,000</div></div>
         </div>
-        <!-- 中央 -->
+        <!-- 中央エリア -->
         <div class="center-area">
             <div>
                 <div class="score-box" id="sc">0</div>
-                <div style="font-size:10px; color:#666;">CPS: <span id="cps">0</span> | x<span id="mult">1</span></div>
+                <div style="font-size:10px; color:#666; font-weight:bold;">CPS: <span id="cps">0</span> | x<span id="mult">1</span></div>
                 <div style="font-size:14px; color:#ffa500; font-weight:bold;">🪙 <span id="coins">0</span></div>
             </div>
             <div class="click-area" id="c-area"><div class="icecream" id="item-btn">🍨</div></div>
@@ -52,7 +52,7 @@
                 <div class="item" id="buy-u2"><div>COOKIE (+1.0)<br>COST: <span id="c2">100</span></div><div id="n2">0</div></div>
             </div>
         </div>
-        <!-- 右パネル -->
+        <!-- 右パネル：コインショップ -->
         <div class="side-panel">
             <div class="title">🪙 COIN SHOP</div>
             <div class="item"><div>SPOON (Power x2)<br>COST: 5</div><button class="coin-btn" id="buy-c1">BUY</button></div>
@@ -61,7 +61,7 @@
     </div>
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0, cps = 0, reborns = 0, multiplier = 1, coins = 0, cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, tap = 1, cChance = 0.05, hi = localStorage.getItem('hi1') || 0;
+        let score = 0, cps = 0, reborns = 0, multiplier = 1, coins = 0, cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, tap = 1, cChance = 0.05, hi = localStorage.getItem('hi2') || 0;
         function sound(f, d) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const o = audioCtx.createOscillator(), g = audioCtx.createGain();
@@ -83,7 +83,7 @@
         document.getElementById('item-btn').addEventListener('touchstart', (e) => {
             e.preventDefault(); const g = tap * multiplier; score += g; sound(600, 0.05); let p = '+' + g;
             if (Math.random() < cChance) { coins++; p += ' 🪙'; sound(1100, 0.1); } pop(p, e);
-            if(score > hi) { hi = score; localStorage.setItem('hi1', hi); } ui();
+            if(score > hi) { hi = score; localStorage.setItem('hi2', hi); } ui();
         });
         function buy(c, n, a, f) { if (score >= c) { score -= c; n++; cps += a; c = Math.floor(c * 1.15); sound(f, 0.08); return [c, n]; } sound(200, 0.1); return null; }
         document.getElementById('buy-u1').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost1, num1, 0.1, 700); if(r) { [cost1, num1] = r; ui(); } });
@@ -91,7 +91,7 @@
         document.getElementById('buy-c1').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 5) { coins -= 5; tap *= 2; sound(1300, 0.15); ui(); } });
         document.getElementById('buy-c2').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 15) { coins -= 15; cChance += 0.05; sound(1400, 0.15); ui(); } });
         document.getElementById('rb-btn').addEventListener('touchstart', (e) => { e.preventDefault(); if (score >= 1000) { score = 0; cps = 0; num1 = 0; cost1 = 15; num2 = 0; cost2 = 100; reborns++; multiplier = reborns + 1; sound(1300, 0.2); } ui(); });
-        setInterval(() => { score += cps / 10; if(score > hi) { hi = score; localStorage.setItem('hi1', hi); } ui(); }, 100); ui();
+        setInterval(() => { score += cps / 10; if(score > hi) { hi = score; localStorage.setItem('hi2', hi); } ui(); }, 100); ui();
     </script>
 </body>
 </html>
