@@ -1,106 +1,294 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICE CREAM V3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スーパー・アイスクリッカー</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-        body { background: linear-gradient(135deg, #ffdee9, #b5fffc); font-family: Arial, sans-serif; text-align: center; color: #4a4a4a; min-height: 100vh; padding: 5px; transition: 0.5s; }
-        .main-layout { display: flex; justify-content: center; gap: 5px; max-width: 100%; margin: 0 auto; }
-        .center-area { width: 220px; display: flex; flex-direction: column; gap: 5px; }
-        .side-panel { width: 160px; background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 6px; font-size: 11px; }
-        .score-box { font-size: 26px; font-weight: bold; color: #ff6b8b; }
-        .click-area { height: 95px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .icecream { width: 85px; height: 85px; background: radial-gradient(#fff, #ffccd5); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(255,182,193,0.5); display: flex; justify-content: center; align-items: center; font-size: 45px; transition: transform 0.05s; }
-        .icecream:active { transform: scale(0.9); }
-        .num-pop { position: absolute; color: #ff6b8b; font-weight: bold; font-size: 16px; animation: fUp 0.5s ease-out forwards; pointer-events: none; text-shadow: 1px 1px #fff; }
-        @keyframes fUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
-        .panel-block { background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 5px; }
-        .item { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #ffe4e1; border-radius: 6px; padding: 4px; margin-top: 3px; font-size: 10px; font-weight: bold; text-align: left; }
-        .rb-btn, .coin-btn, .world-btn { background: #ff6b8b; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: bold; }
-        .coin-btn { background: #ffa500; } .world-btn { background: #9370db; width: 100%; margin-top: 3px; }
-        .rb-btn:disabled, .coin-btn:disabled, .world-btn:disabled { background: #ccc; }
-        .title { font-size: 11px; color: #ff6b8b; font-weight: bold; text-align: left; border-bottom: 1px dashed #ffccd5; padding-bottom: 2px; }
-        .r-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 10px; font-weight: bold; }
-        .sk-box { display: flex; gap: 4px; margin-top: 3px; justify-content: center; }
-        .sk-btn { font-size: 14px; background: #fff; border: 1px solid #ffccd5; border-radius: 4px; padding: 2px 5px; }
-        .sk-btn.active { background: #ff6b8b; border-color: #ff6b8b; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .login-box { background: #fff; padding: 20px; border-radius: 15px; border: 3px solid #ffccd5; text-align: center; }
-        .login-box input { padding: 6px; font-size: 14px; width: 150px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        #ice-cream {
+            font-size: 120px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.05s;
+            display: inline-block;
+            margin: 20px;
+        }
+        #ice-cream:active {
+            transform: scale(0.9);
+        }
+        /* ポップアップテキストのアニメーション */
+        .click-pop {
+            position: absolute;
+            font-weight: bold;
+            font-size: 24px;
+            color: #ff4500;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.2); }
+        }
+        /* ゴールデンアイスのスタイル */
+        .golden-ice {
+            position: absolute;
+            font-size: 50px;
+            cursor: pointer;
+            z-index: 100;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.3); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .panel {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .shop-item, .achievement-item {
+            border-bottom: 1px dashed #eee;
+            padding: 10px 0;
+        }
+        .achievement-item.unlocked {
+            background-color: #e0f7fa;
+            color: #006064;
+        }
+        button {
+            padding: 6px 12px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .system-btn {
+            background-color: #708090;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="overlay" id="login-overlay"><div class="login-box"><h3 style="color:#ff6b8b; margin-bottom:10px; font-size:16px;">ENTER YOUR NAME</h3><input type="text" id="name-input" placeholder="Your Name..." maxlength="10"><br><button class="rb-btn" id="start-btn" style="font-size:12px; padding:5px 15px;">START GAME</button></div></div>
-    <h1 style="font-size:16px; color:#ff6b8b; margin-bottom:5px;" id="world-title">🍨 ICE CREAM CLICKER (1st WORLD) 🍨</h1>
-    <div class="main-layout">
-        <!-- 左パネル -->
-        <div class="side-panel">
-            <div class="title">🌐 WORLD RANKING</div>
-            <div class="r-row" style="color:#ff6b8b; background:rgba(255,107,139,0.1); border-radius:4px; padding:2px;"><div style="max-width:90px; overflow:hidden;">🥇 <span id="my-name-display">YOU</span></div><div><span id="r1">0</span></div></div>
-            <div class="r-row"><div>🥈 2nd (Cookie)</div><div>150,000</div></div>
-            <div class="r-row"><div>🥉 3rd (Sweets)</div><div>50,000</div></div>
-        </div>
-        <!-- 中央 -->
-        <div class="center-area">
-            <div>
-                <div class="score-box" id="sc">0</div>
-                <div style="font-size:10px; color:#666;">CPS: <span id="cps">0</span> | x<span id="mult">1</span></div>
-                <div style="font-size:12px; color:#ffa500; font-weight:bold;">🪙 <span id="coins">0</span></div>
+
+    <h1>🍦 スーパー・アイスクリッカー 🍦</h1>
+    <h2>所持コイン: <span id="coin-count">0</span></h2>
+    <p>毎秒自動で増える量 (CPS): <span id="cps-count">0</span> | 現在のクリック力: <span id="power-count">1</span></p>
+
+    <!-- メインのアイス -->
+    <div id="ice-cream">🍦</div>
+
+    <div>
+        <button class="system-btn" onclick="saveGame()">手動セーブ</button>
+        <button class="system-btn" style="background-color: #cd5c5c;" onclick="resetGame()">データ初期化</button>
+    </div>
+
+    <div class="container">
+        <!-- ショップパネル -->
+        <div class="panel">
+            <h3>🛒 ショップ</h3>
+            <div class="shop-item">
+                <p>🍫 チョコトッピング (クリック力 +1)</p>
+                <p>価格: <span id="item1-cost">15</span> コイン</p>
+                <button id="buy-item1" onclick="buyItem1()">購入</button>
             </div>
-            <div class="click-area" id="c-area"><div class="icecream" id="item-btn">🍨</div></div>
-            <div class="panel-block">
-                <div class="title">👗 SKINS</div>
-                <div class="sk-box"><button class="sk-btn active" onclick="changeSkin('🍨',0)">🍨</button><button class="sk-btn" id="sk1" onclick="changeSkin('🍦',5)" disabled style="opacity:0.4;">🍦</button><button class="sk-btn" id="sk2" onclick="changeSkin('🍧',15)" disabled style="opacity:0.4;">🍧</button></div>
-            </div>
-            <div class="panel-block">
-                <div class="title">✨ REBORN & WORLDS</div>
-                <div class="item"><div>REBORNS: <span id="rb-cnt">0</span>/5</div><button class="rb-btn" id="rb-btn" onclick="triggerReborn()" disabled>REBORN</button></div>
-                <button class="world-btn" id="world-btn" onclick="goSecondWorld()" disabled>TRAVEL TO 2nd WORLD (Req: 5 RB)</button>
-            </div>
-            <div class="panel-block">
-                <div class="title">🏪 SHOP</div>
-                <div class="item" id="buy-u1"><div>CHERRY (+0.1)<br>COST: <span id="c1">15</span></div><div id="n1">0</div></div>
-                <div class="item" id="buy-u2"><div>COOKIE (+1.0)<br>COST: <span id="c2">100</span></div><div id="n2">0</div></div>
+            <div class="shop-item">
+                <p>🤖 自動アイス製造機 (CPS +1)</p>
+                <p>価格: <span id="item2-cost">100</span> コイン</p>
+                <button id="buy-item2" onclick="buyItem2()">購入</button>
             </div>
         </div>
-        <!-- 右パネル -->
-        <div class="side-panel">
-            <div class="title">🪙 COIN SHOP</div>
-            <div class="item"><div>SPOON (Power x2)<br>COST: 5</div><button class="coin-btn" id="buy-c1">BUY</button></div>
-            <div class="item"><div>CHARM (Coin+)<br>COST: 15</div><button class="coin-btn" id="buy-c2">BUY</button></div>
+
+        <!-- 実績パネル -->
+        <div class="panel">
+            <h3>🏆 実績 (解除でクリック力2倍)</h3>
+            <div id="ach1" class="achievement-item">
+                <p>【ビギナー】100コイン到達</p>
+            </div>
+            <div id="ach2" class="achievement-item">
+                <p>【アイス職人】自動化機を5台保有</p>
+            </div>
         </div>
     </div>
+
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0, cps = 0, reborns = 0, multiplier = 1, coins = 0, cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, tap = 1, cChance = 0.05, currentWorld = 1, hi = localStorage.getItem('hi3') || 0, pName = localStorage.getItem('pName') || '', currentSkin = '🍨';
-        if(pName) { document.getElementById('login-overlay').style.display = 'none'; document.getElementById('my-name-display').innerText = pName; }
-        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault(); const val = document.getElementById('name-input').value.trim(); pName = val ? val : 'Player'; localStorage.setItem('pName', pName);
-            document.getElementById('my-name-display').innerText = pName; document.getElementById('login-overlay').style.display = 'none';
+        // --- ゲームデータ ---
+        let gameData = {
+            coins: 0,
+            baseClickPower: 1,
+            cps: 0,
+            item1Cost: 15,
+            item2Cost: 100,
+            item2Count: 0,
+            ach1Unlocked: false,
+            ach2Unlocked: false
+        };
+
+        // 実績による倍率計算
+        function getClickPower() {
+            let multiplier = 1;
+            if (gameData.ach1Unlocked) multiplier *= 2;
+            if (gameData.ach2Unlocked) multiplier *= 2;
+            return gameData.baseClickPower * multiplier;
+        }
+
+        // --- 画面表示の更新 ---
+        function updateDisplay() {
+            document.getElementById('coin-count').innerText = Math.floor(gameData.coins);
+            document.getElementById('cps-count').innerText = gameData.cps;
+            document.getElementById('power-count').innerText = getClickPower();
+            document.getElementById('item1-cost').innerText = gameData.item1Cost;
+            document.getElementById('item2-cost').innerText = gameData.item2Cost;
+
+            // ボタンの有効化制御
+            document.getElementById('buy-item1').disabled = gameData.coins < gameData.item1Cost;
+            document.getElementById('buy-item2').disabled = gameData.coins < gameData.item2Cost;
+
+            // 実績の見た目更新
+            if (gameData.ach1Unlocked) document.getElementById('ach1').classList.add('unlocked');
+            if (gameData.ach2Unlocked) document.getElementById('ach2').classList.add('unlocked');
+        }
+
+        // --- エフェクト演出 ---
+        function createPopEffect(x, y, text) {
+            const pop = document.createElement('div');
+            pop.className = 'click-pop';
+            pop.innerText = text;
+            pop.style.left = `${x}px`;
+            pop.style.top = `${y}px`;
+            document.body.appendChild(pop);
+            
+            setTimeout(() => pop.remove(), 800);
+        }
+
+        // --- メインのアイスクリック ---
+        document.getElementById('ice-cream').addEventListener('click', (e) => {
+            const power = getClickPower();
+            gameData.coins += power;
+            createPopEffect(e.pageX, e.pageY, `+${power}`);
+            checkAchievements();
+            updateDisplay();
         });
-        function sound(f, d) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.setValueAtTime(f, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
+
+        // --- アイテム購入 ---
+        function buyItem1() {
+            if (gameData.coins >= gameData.item1Cost) {
+                gameData.coins -= gameData.item1Cost;
+                gameData.baseClickPower += 1;
+                gameData.item1Cost = Math.ceil(gameData.item1Cost * 1.15);
+                updateDisplay();
+            }
         }
-        function pop(t, e) {
-            const a = document.getElementById('c-area'), d = document.createElement('div'); d.className = 'num-pop'; d.innerText = t;
-            const tch = e.touches, r = a.getBoundingClientRect(); d.style.left = (tch.clientX - r.left - 10) + 'px'; d.style.top = (tch.clientY - r.top - 20) + 'px';
-            a.appendChild(d); setTimeout(() => d.remove(), 500);
+
+        function buyItem2() {
+            if (gameData.coins >= gameData.item2Cost) {
+                gameData.coins -= gameData.item2Cost;
+                gameData.cps += 1;
+                gameData.item2Count += 1;
+                gameData.item2Cost = Math.ceil(gameData.item2Cost * 1.15);
+                checkAchievements();
+                updateDisplay();
+            }
         }
-        function changeSkin(emoji, req) { if(reborns >= req) { currentSkin = emoji; document.getElementById('item-btn').innerText = emoji; sound(500, 0.05); } }
-        function updateBackground() {
-            if (currentWorld === 2) { document.body.style.background = 'linear-gradient(135deg, #4b0082, #000080)'; document.body.style.color = '#fff'; return; }
-            if (score >= 500) document.body.style.background = 'linear-gradient(135deg, #ff9a9e, #fecfef)';
-            else if (score >= 100) document.body.style.background = 'linear-gradient(135deg, #a1c4fd, #c2e9fb)';
-            else document.body.style.background = 'linear-gradient(135deg, #ffdee9, #b5fffc)';
+
+        // --- 実績チェック ---
+        function checkAchievements() {
+            if (!gameData.ach1Unlocked && gameData.coins >= 100) {
+                gameData.ach1Unlocked = true;
+                alert('🏆 実績解除: 100コイン到達！クリック力が2倍になった！');
+            }
+            if (!gameData.ach2Unlocked && gameData.item2Count >= 5) {
+                gameData.ach2Unlocked = true;
+                alert('🏆 実績解除: アイス職人！クリック力がさらに2倍になった！');
+            }
         }
-        function ui() {
-            document.getElementById('sc').innerText = Math.floor(score); document.getElementById('cps').innerText = (cps * (currentWorld === 2 ? 2 : 1)).toFixed(1);
-            document.getElementById('mult').innerText = multiplier; document.getElementById('rb-cnt').innerText = reborns; document.getElementById('coins').innerText = coins;
-            document.getElementById('c1').innerText = cost1; document.getElementById('n1').innerText = num1; document.getElementById('c2').innerText = cost2; document.getElementById('n2').innerText = num2;
-            document.getElementById('r1').innerText = Math.floor(hi).toLocaleString(); document.getElementById('rb-btn').disabled = (score < 1000);
-            document.getElementById('buy-c1').disabled = (coins < 5); document.getElementById('buy-c2').disabled = (coins < 15); document.getElementById('world-btn').disabled = (reborns < 5 || currentWorld === 2);
-document.getElementById('sk1').disabled = (reborns < 5); if(reborns >= 5) document.getElementById('sk1').style.opacity = '1';document.getElementById('sk2').disabled = (reborns < 15); if(reborns >= 15) document.getElementById('sk2').style.opacity = '1';updateBackground();}document.getElementById('item-btn').addEventListener('touchstart', (e) => {e.preventDefault(); const g = tap * multiplier * (currentWorld === 2 ? 2 : 1); score += g; sound(600, 0.05); let p = '+' + g;if (Math.random() < cChance) { coins++; p += ' 🪙'; sound(1100, 0.1); } pop(p, e); if(score > hi) { hi = score; localStorage.setItem('hi3', hi); } ui();});function buy(c, n, a, f) { if (score >= c) { score -= c; n++; cps += a; c = Math.floor(c * 1.15); sound(f, 0.08); return [c, n]; } sound(200, 0.1); return null; }document.getElementById('buy-u1').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost1, num1, 0.1, 700); if(r) { [cost1, num1] = r; ui(); } });document.getElementById('buy-u2').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost2, num2, 1.0, 850); if(r) { [cost2, num2] = r; ui(); } });document.getElementById('buy-c1').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 5) { coins -= 5; tap *= 2; sound(1300, 0.15); ui(); } });document.getElementById('buy-c2').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 15) { coins -= 15; cChance += 0.05; sound(1400, 0.15); ui(); } });function triggerReborn() { if (score >= 1000) { score = 0; cps = 0; num1 = 0; cost1 = 15; num2 = 0; cost2 = 100; reborns++; multiplier = reborns + 1; sound(1300, 0.2); ui(); } }function goSecondWorld() { if (reborns >= 5) { currentWorld = 2; document.getElementById('world-title').innerText = '🚀 SPACE ICE CREAM (2nd WORLD) 🚀'; document.getElementById('world-title').style.color = '#9370db'; sound(1500, 0.4); ui(); } }setInterval(() => { score += (cps * (currentWorld === 2 ? 2 : 1)) / 10; if(score > hi) { hi = score; localStorage.setItem('hi3', hi); } ui(); }, 100); ui();
+
+        // --- ゴールデンアイス（ランダムイベント） ---
+        function spawnGoldenIce() {
+            const golden = document.createElement('div');
+            golden.className = 'golden-ice';
+            golden.innerText = '🌟🍦🌟';
+            
+            // 画面内のランダムな位置に配置
+            golden.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            golden.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            
+            golden.addEventListener('click', (e) => {
+                // 所持金の10%（最低でも50コイン）をボーナス
+                const bonus = Math.max(50, Math.floor(gameData.coins * 0.1));
+                gameData.coins += bonus;
+                createPopEffect(e.pageX, e.pageY, `✨ボーナス +${bonus}✨`);
+                golden.remove();
+                updateDisplay();
+            });
+
+            document.body.appendChild(golden);
+            // 8秒クリックされなかったら消滅
+            setTimeout(() => { golden.remove(); }, 8000);
+        }
+        // 15秒〜30秒のランダムな間隔でゴールデンアイスを出現させる
+        setInterval(() => {
+            if (Math.random() > 0.5) spawnGoldenIce();
+        }, 15000);
+
+        // --- 自動化（CPS）と自動セーブ ---
+        setInterval(() => {
+            if (gameData.cps > 0) {
+                gameData.coins += gameData.cps;
+                checkAchievements();
+                updateDisplay();
+            }
+        }, 1000);
+
+        // 30秒ごとにオートセーブ
+        setInterval(saveGame, 30000);
+
+        // --- セーブ＆ロードシステム ---
+        function saveGame() {
+            localStorage.setItem('iceClickerSave', JSON.stringify(gameData));
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('iceClickerSave');
+            if (savedData) {
+                gameData = JSON.parse(savedData);
+                updateDisplay();
+            }
+        }
+
+        function resetGame() {
+            if (confirm('本当にゲームデータをリセットしますか？')) {
+                localStorage.removeItem('iceClickerSave');
+                location.reload();
+            }
+        }
+
+        // ページを開いたときにセーブデータを読み込む
+        loadGame();
+    </script>
+</body>
+</html>
