@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICE CREAM V2</title>
+    <title>ICE CREAM V3</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-        body { background: linear-gradient(135deg, #ffdee9, #b5fffc); font-family: Arial, sans-serif; text-align: center; color: #4a4a4a; min-height: 100vh; padding: 5px; }
-        .main-layout { display: flex; justify-content: center; gap: 6px; max-width: 100%; margin: 0 auto; }
+        body { background: linear-gradient(135deg, #ffdee9, #b5fffc); font-family: Arial, sans-serif; text-align: center; color: #4a4a4a; min-height: 100vh; padding: 5px; transition: 0.5s; }
+        .main-layout { display: flex; justify-content: center; gap: 5px; max-width: 100%; margin: 0 auto; }
         .center-area { width: 220px; display: flex; flex-direction: column; gap: 5px; }
         .side-panel { width: 160px; background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 6px; font-size: 11px; }
         .score-box { font-size: 26px; font-weight: bold; color: #ff6b8b; }
@@ -18,33 +18,46 @@
         @keyframes fUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
         .panel-block { background: rgba(255,255,255,0.85); border: 2px solid #ffccd5; border-radius: 10px; padding: 5px; }
         .item { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #ffe4e1; border-radius: 6px; padding: 4px; margin-top: 3px; font-size: 10px; font-weight: bold; text-align: left; }
-        .rb-btn { background: #ff6b8b; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; }
-        .coin-btn { background: #ffa500; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; }
+        .rb-btn, .coin-btn, .world-btn { background: #ff6b8b; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: bold; }
+        .coin-btn { background: #ffa500; } .world-btn { background: #9370db; width: 100%; margin-top: 3px; }
+        .rb-btn:disabled, .coin-btn:disabled, .world-btn:disabled { background: #ccc; }
         .title { font-size: 11px; color: #ff6b8b; font-weight: bold; text-align: left; border-bottom: 1px dashed #ffccd5; padding-bottom: 2px; }
         .r-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 10px; font-weight: bold; }
+        .sk-box { display: flex; gap: 4px; margin-top: 3px; justify-content: center; }
+        .sk-btn { font-size: 14px; background: #fff; border: 1px solid #ffccd5; border-radius: 4px; padding: 2px 5px; }
+        .sk-btn.active { background: #ff6b8b; border-color: #ff6b8b; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .login-box { background: #fff; padding: 20px; border-radius: 15px; border: 3px solid #ffccd5; text-align: center; }
+        .login-box input { padding: 6px; font-size: 14px; width: 150px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
     </style>
 </head>
 <body>
-    <h1 style="font-size:18px; color:#ff6b8b; margin-bottom:5px;">ICE CREAM CLICKER v2</h1>
+    <div class="overlay" id="login-overlay"><div class="login-box"><h3 style="color:#ff6b8b; margin-bottom:10px; font-size:16px;">ENTER YOUR NAME</h3><input type="text" id="name-input" placeholder="Your Name..." maxlength="10"><br><button class="rb-btn" id="start-btn" style="font-size:12px; padding:5px 15px;">START GAME</button></div></div>
+    <h1 style="font-size:16px; color:#ff6b8b; margin-bottom:5px;" id="world-title">🍨 ICE CREAM CLICKER (1st WORLD) 🍨</h1>
     <div class="main-layout">
-        <!-- 左パネル：ランキング -->
+        <!-- 左パネル -->
         <div class="side-panel">
-            <div class="title">🌐 RANKING</div>
-            <div class="r-row" style="color:#ff6b8b; background:rgba(255,107,139,0.1); border-radius:4px; padding:2px;"><div>🥇 1st (YOU)</div><div><span id="r1">0</span></div></div>
-            <div class="r-row" style="border-bottom:1px solid #fff3f5;"><div>🥈 2nd (Cookie)</div><div>150,000</div></div>
+            <div class="title">🌐 WORLD RANKING</div>
+            <div class="r-row" style="color:#ff6b8b; background:rgba(255,107,139,0.1); border-radius:4px; padding:2px;"><div style="max-width:90px; overflow:hidden;">🥇 <span id="my-name-display">YOU</span></div><div><span id="r1">0</span></div></div>
+            <div class="r-row"><div>🥈 2nd (Cookie)</div><div>150,000</div></div>
             <div class="r-row"><div>🥉 3rd (Sweets)</div><div>50,000</div></div>
         </div>
-        <!-- 中央エリア -->
+        <!-- 中央 -->
         <div class="center-area">
             <div>
                 <div class="score-box" id="sc">0</div>
-                <div style="font-size:10px; color:#666; font-weight:bold;">CPS: <span id="cps">0</span> | x<span id="mult">1</span></div>
-                <div style="font-size:14px; color:#ffa500; font-weight:bold;">🪙 <span id="coins">0</span></div>
+                <div style="font-size:10px; color:#666;">CPS: <span id="cps">0</span> | x<span id="mult">1</span></div>
+                <div style="font-size:12px; color:#ffa500; font-weight:bold;">🪙 <span id="coins">0</span></div>
             </div>
             <div class="click-area" id="c-area"><div class="icecream" id="item-btn">🍨</div></div>
             <div class="panel-block">
-                <div class="title">✨ REBORN</div>
-                <div class="item"><div>REBORNS: <span id="rb-cnt">0</span></div><button class="rb-btn" id="rb-btn" disabled>REBORN</button></div>
+                <div class="title">👗 SKINS</div>
+                <div class="sk-box"><button class="sk-btn active" onclick="changeSkin('🍨',0)">🍨</button><button class="sk-btn" id="sk1" onclick="changeSkin('🍦',5)" disabled style="opacity:0.4;">🍦</button><button class="sk-btn" id="sk2" onclick="changeSkin('🍧',15)" disabled style="opacity:0.4;">🍧</button></div>
+            </div>
+            <div class="panel-block">
+                <div class="title">✨ REBORN & WORLDS</div>
+                <div class="item"><div>REBORNS: <span id="rb-cnt">0</span>/5</div><button class="rb-btn" id="rb-btn" onclick="triggerReborn()" disabled>REBORN</button></div>
+                <button class="world-btn" id="world-btn" onclick="goSecondWorld()" disabled>TRAVEL TO 2nd WORLD (Req: 5 RB)</button>
             </div>
             <div class="panel-block">
                 <div class="title">🏪 SHOP</div>
@@ -52,7 +65,7 @@
                 <div class="item" id="buy-u2"><div>COOKIE (+1.0)<br>COST: <span id="c2">100</span></div><div id="n2">0</div></div>
             </div>
         </div>
-        <!-- 右パネル：コインショップ -->
+        <!-- 右パネル -->
         <div class="side-panel">
             <div class="title">🪙 COIN SHOP</div>
             <div class="item"><div>SPOON (Power x2)<br>COST: 5</div><button class="coin-btn" id="buy-c1">BUY</button></div>
@@ -61,11 +74,15 @@
     </div>
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0, cps = 0, reborns = 0, multiplier = 1, coins = 0, cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, tap = 1, cChance = 0.05, hi = localStorage.getItem('hi2') || 0;
+        let score = 0, cps = 0, reborns = 0, multiplier = 1, coins = 0, cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, tap = 1, cChance = 0.05, currentWorld = 1, hi = localStorage.getItem('hi3') || 0, pName = localStorage.getItem('pName') || '', currentSkin = '🍨';
+        if(pName) { document.getElementById('login-overlay').style.display = 'none'; document.getElementById('my-name-display').innerText = pName; }
+        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault(); const val = document.getElementById('name-input').value.trim(); pName = val ? val : 'Player'; localStorage.setItem('pName', pName);
+            document.getElementById('my-name-display').innerText = pName; document.getElementById('login-overlay').style.display = 'none';
+        });
         function sound(f, d) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-            o.frequency.setValueAtTime(f, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.setValueAtTime(f, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
         }
         function pop(t, e) {
@@ -73,25 +90,17 @@
             const tch = e.touches, r = a.getBoundingClientRect(); d.style.left = (tch.clientX - r.left - 10) + 'px'; d.style.top = (tch.clientY - r.top - 20) + 'px';
             a.appendChild(d); setTimeout(() => d.remove(), 500);
         }
+        function changeSkin(emoji, req) { if(reborns >= req) { currentSkin = emoji; document.getElementById('item-btn').innerText = emoji; sound(500, 0.05); } }
+        function updateBackground() {
+            if (currentWorld === 2) { document.body.style.background = 'linear-gradient(135deg, #4b0082, #000080)'; document.body.style.color = '#fff'; return; }
+            if (score >= 500) document.body.style.background = 'linear-gradient(135deg, #ff9a9e, #fecfef)';
+            else if (score >= 100) document.body.style.background = 'linear-gradient(135deg, #a1c4fd, #c2e9fb)';
+            else document.body.style.background = 'linear-gradient(135deg, #ffdee9, #b5fffc)';
+        }
         function ui() {
-            document.getElementById('sc').innerText = Math.floor(score); document.getElementById('cps').innerText = cps.toFixed(1);
+            document.getElementById('sc').innerText = Math.floor(score); document.getElementById('cps').innerText = (cps * (currentWorld === 2 ? 2 : 1)).toFixed(1);
             document.getElementById('mult').innerText = multiplier; document.getElementById('rb-cnt').innerText = reborns; document.getElementById('coins').innerText = coins;
             document.getElementById('c1').innerText = cost1; document.getElementById('n1').innerText = num1; document.getElementById('c2').innerText = cost2; document.getElementById('n2').innerText = num2;
             document.getElementById('r1').innerText = Math.floor(hi).toLocaleString(); document.getElementById('rb-btn').disabled = (score < 1000);
-            document.getElementById('buy-c1').disabled = (coins < 5); document.getElementById('buy-c2').disabled = (coins < 15);
-        }
-        document.getElementById('item-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault(); const g = tap * multiplier; score += g; sound(600, 0.05); let p = '+' + g;
-            if (Math.random() < cChance) { coins++; p += ' 🪙'; sound(1100, 0.1); } pop(p, e);
-            if(score > hi) { hi = score; localStorage.setItem('hi2', hi); } ui();
-        });
-        function buy(c, n, a, f) { if (score >= c) { score -= c; n++; cps += a; c = Math.floor(c * 1.15); sound(f, 0.08); return [c, n]; } sound(200, 0.1); return null; }
-        document.getElementById('buy-u1').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost1, num1, 0.1, 700); if(r) { [cost1, num1] = r; ui(); } });
-        document.getElementById('buy-u2').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost2, num2, 1.0, 850); if(r) { [cost2, num2] = r; ui(); } });
-        document.getElementById('buy-c1').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 5) { coins -= 5; tap *= 2; sound(1300, 0.15); ui(); } });
-        document.getElementById('buy-c2').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 15) { coins -= 15; cChance += 0.05; sound(1400, 0.15); ui(); } });
-        document.getElementById('rb-btn').addEventListener('touchstart', (e) => { e.preventDefault(); if (score >= 1000) { score = 0; cps = 0; num1 = 0; cost1 = 15; num2 = 0; cost2 = 100; reborns++; multiplier = reborns + 1; sound(1300, 0.2); } ui(); });
-        setInterval(() => { score += cps / 10; if(score > hi) { hi = score; localStorage.setItem('hi2', hi); } ui(); }, 100); ui();
-    </script>
-</body>
-</html>
+            document.getElementById('buy-c1').disabled = (coins < 5); document.getElementById('buy-c2').disabled = (coins < 15); document.getElementById('world-btn').disabled = (reborns < 5 || currentWorld === 2);
+document.getElementById('sk1').disabled = (reborns < 5); if(reborns >= 5) document.getElementById('sk1').style.opacity = '1';document.getElementById('sk2').disabled = (reborns < 15); if(reborns >= 15) document.getElementById('sk2').style.opacity = '1';updateBackground();}document.getElementById('item-btn').addEventListener('touchstart', (e) => {e.preventDefault(); const g = tap * multiplier * (currentWorld === 2 ? 2 : 1); score += g; sound(600, 0.05); let p = '+' + g;if (Math.random() < cChance) { coins++; p += ' 🪙'; sound(1100, 0.1); } pop(p, e); if(score > hi) { hi = score; localStorage.setItem('hi3', hi); } ui();});function buy(c, n, a, f) { if (score >= c) { score -= c; n++; cps += a; c = Math.floor(c * 1.15); sound(f, 0.08); return [c, n]; } sound(200, 0.1); return null; }document.getElementById('buy-u1').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost1, num1, 0.1, 700); if(r) { [cost1, num1] = r; ui(); } });document.getElementById('buy-u2').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost2, num2, 1.0, 850); if(r) { [cost2, num2] = r; ui(); } });document.getElementById('buy-c1').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 5) { coins -= 5; tap *= 2; sound(1300, 0.15); ui(); } });document.getElementById('buy-c2').addEventListener('touchstart', (e) => { e.preventDefault(); if (coins >= 15) { coins -= 15; cChance += 0.05; sound(1400, 0.15); ui(); } });function triggerReborn() { if (score >= 1000) { score = 0; cps = 0; num1 = 0; cost1 = 15; num2 = 0; cost2 = 100; reborns++; multiplier = reborns + 1; sound(1300, 0.2); ui(); } }function goSecondWorld() { if (reborns >= 5) { currentWorld = 2; document.getElementById('world-title').innerText = '🚀 SPACE ICE CREAM (2nd WORLD) 🚀'; document.getElementById('world-title').style.color = '#9370db'; sound(1500, 0.4); ui(); } }setInterval(() => { score += (cps * (currentWorld === 2 ? 2 : 1)) / 10; if(score > hi) { hi = score; localStorage.setItem('hi3', hi); } ui(); }, 100); ui();
