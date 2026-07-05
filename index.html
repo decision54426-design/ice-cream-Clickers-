@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ICE CREAM</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, #ffdee9, #b5fffc); font-family: Arial, sans-serif; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; color: #4a4a4a; overflow: hidden; }
+        h1 { font-size: 20px; color: #ff6b8b; text-shadow: 1px 1px #fff; }
+        .score-box { font-size: 30px; font-weight: bold; color: #ff6b8b; }
+        .click-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .icecream { width: 120px; height: 120px; background: radial-gradient(#fff, #ffccd5); border: 4px solid #fff; border-radius: 50%; box-shadow: 0 6px 15px rgba(255,182,193,0.5); display: flex; justify-content: center; align-items: center; font-size: 60px; transition: transform 0.05s; z-index: 2; }
+        .icecream:active { transform: scale(0.9); }
+        .num-pop { position: absolute; color: #ff6b8b; font-weight: bold; font-size: 20px; animation: floatUp 0.5s ease-out forwards; pointer-events: none; z-index: 3; text-shadow: 1px 1px #fff; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        .panel { background: rgba(255,255,255,0.75); border: 2px solid #ffccd5; border-radius: 12px; padding: 6px; width: 100%; max-width: 290px; margin: 2px auto; }
+        .shop-scroll { max-height: 160px; overflow-y: auto; padding-right: 2px; }
+        .item { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #ffe4e1; border-radius: 8px; padding: 6px; margin-top: 4px; font-size: 11px; font-weight: bold; }
+        .rb-btn { background: #ff6b8b; color: #fff; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: bold; }
+        .rb-btn:disabled { background: #ccc; }
+        .title-text { font-size: 11px; color: #ff6b8b; font-weight: bold; text-align: left; text-transform: uppercase; }
+        .info-text { font-size: 11px; text-align: left; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>ICE CREAM CLICKER</h1>
+    <div>
+        <div class="score-box" id="sc">0</div>
+        <div style="font-size:11px; color:#666;">CPS: <span id="cps">0</span> | MULTI: x<span id="mult">1</span></div>
+    </div>
+
+    <div class="click-area" id="c-area">
+        <div class="icecream" id="item-btn">🍨</div>
+    </div>
+
+    <div class="panel">
+        <div class="title-text">REBORN SYSTEM</div>
+        <div class="item">
+            <div class="info-text">REBORNS: <span id="rb-cnt">0</span></div>
+            <button class="rb-btn" id="rb-btn" disabled>REBORN (COST: 1000)</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="title-text">SWEET SHOP</div>
+        <div class="shop-scroll">
+            <div class="item" id="buy-u1">
+                <div>CHERRY (+0.1 CPS)<br><span style="color:#ff6b8b;">COST: <span id="c1">15</span></span></div>
+                <div id="n1">0</div>
+            </div>
+            <div class="item" id="buy-u2">
+                <div>COOKIE (+1.0 CPS)<br><span style="color:#ff6b8b;">COST: <span id="c2">100</span></span></div>
+                <div id="n2">0</div>
+            </div>
+            <div class="item" id="buy-u3">
+                <div>MACARON (+5.0 CPS)<br><span style="color:#ff6b8b;">COST: <span id="c3">500</span></span></div>
+                <div id="n3">0</div>
+            </div>
+            <div class="item" id="buy-u4">
+                <div>SUNDAE (+20.0 CPS)<br><span style="color:#ff6b8b;">COST: <span id="c4">2000</span></span></div>
+                <div id="n4">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="title-text">RANKING (HI-SCORE)</div>
+        <div class="info-text">🥇 1st: <span id="r1">0</span> scoops</div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let score = 0, cps = 0, reborns = 0, multiplier = 1;
+        let cost1 = 15, num1 = 0, cost2 = 100, num2 = 0, cost3 = 500, num3 = 0, cost4 = 2000, num4 = 0;
+        let hiScore = localStorage.getItem('hi1') || 0;
+
+        function sound(f, d) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + d);
+        }
+
+        function pop(txt, e) {
+            const area = document.getElementById('c-area'), div = document.createElement('div');
+            div.className = 'num-pop'; div.innerText = txt;
+            const touch = e.touches[0], rect = area.getBoundingClientRect();
+            div.style.left = (touch.clientX - rect.left - 10) + 'px';
+            div.style.top = (touch.clientY - rect.top - 20) + 'px';
+            area.appendChild(div); setTimeout(() => div.remove(), 500);
+        }
+
+        function ui() {
+            document.getElementById('sc').innerText = Math.floor(score);
+            document.getElementById('cps').innerText = cps.toFixed(1);
+            document.getElementById('mult').innerText = multiplier;
+            document.getElementById('rb-cnt').innerText = reborns;
+            document.getElementById('c1').innerText = cost1; document.getElementById('n1').innerText = num1;
+            document.getElementById('c2').innerText = cost2; document.getElementById('n2').innerText = num2;
+            document.getElementById('c3').innerText = cost3; document.getElementById('n3').innerText = num3;
+            document.getElementById('c4').innerText = cost4; document.getElementById('n4').innerText = num4;
+            document.getElementById('r1').innerText = Math.floor(hiScore);
+            document.getElementById('rb-btn').disabled = (score < 1000);
+        }
+
+        document.getElementById('item-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault(); const gain = 1 * multiplier; score += gain; sound(600, 0.05); pop('+' + gain, e);
+            if(score > hiScore) { hiScore = score; localStorage.setItem('hi1', hiScore); }
+            ui();
+        });
+
+        function buy(cost, num, cpsAdd, cId, nId, soundF) {
+            if (score >= cost) {
+                score -= cost; num++; cps += cpsAdd; cost = Math.floor(cost * 1.15); sound(soundF, 0.08);
+                return [cost, num];
+            } else { sound(200, 0.1); return null; }
+        }
+
+        document.getElementById('buy-u1').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost1, num1, 0.1, 'c1', 'n1', 700); if(r) { [cost1, num1] = r; ui(); } });
+        document.getElementById('buy-u2').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost2, num2, 1.0, 'c2', 'n2', 850); if(r) { [cost2, num2] = r; ui(); } });
+        document.getElementById('buy-u3').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost3, num3, 5.0, 'c3', 'n3', 1000); if(r) { [cost3, num3] = r; ui(); } });
+        document.getElementById('buy-u4').addEventListener('touchstart', (e) => { e.preventDefault(); const r = buy(cost4, num4, 20.0, 'c4', 'n4', 1200); if(r) { [cost4, num4] = r; ui(); } });
+
+        document.getElementById('rb-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (score >= 1000) {
+                score = 0; cps = 0; num1 = 0; cost1 = 15; num2 = 0; cost2 = 100; num3 = 0; cost3 = 500; num4 = 0; cost4 = 2000;
+                reborns++; multiplier = reborns + 1; sound(1300, 0.2);
+            }
+            ui();
+        });
+
+        setInterval(() => { score += cps / 10; if(score > hiScore) { hiScore = score; localStorage.setItem('hi1', hiScore); } ui(); }, 100);
+        ui();
+    </script>
+</body>
+</html>
